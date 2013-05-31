@@ -106,7 +106,13 @@ class Pastor{
 
 -------------------------------------------------------------------------------------------------------------------
 */
-
+define('TAG_OUTLINE_CORNER',       '+');
+define('TAG_OUTLINE_HORIZONTAL',   '-');
+define('TAG_OUTLINE_VERTICAL',     '|');
+define('TAG_VISIBILITY_PUBLIC',    '+');
+define('TAG_VISIBILITY_PROTECTED', '#');
+define('TAG_VISIBILITY_PRIVATE',   '-');
+define('TAG_DECORATE_STATIC',      '&lt;&lt;static&gt;&gt;');
 
 class Pastor{
   private   $address;
@@ -138,15 +144,41 @@ class Pastor{
   }
 }
 
-$test1 = new ReflectionClass('Pastor');
-d($test1);die;
 
 
+// 建立反射类
+$rc = new ReflectionClass('Pastor');
+
+// 初始化输出内容的变量
+$ascii  = '';
+$ascii .= '+-----------------------------------------+'.PHP_EOL;
+
+// 打印反射类
+d($rc);
+
+// 获取类名称
+d($rc->getName());// Paster
+$ascii .= '| '.$rc->getName().'                                  |';
+
+// 获取类属性
+$props = $rc->getProperties( ReflectionProperty::IS_PUBLIC |
+                             ReflectionProperty::IS_PROTECTED |
+                             ReflectionProperty::IS_STATIC |
+                             ReflectionProperty::IS_PRIVATE );
+foreach ($props as $prop) {
+  d($prop->getName());
+}
+
+// 获取类方法
+$methods = $rc->getMethods();
+foreach ($methods as $method) {
+  d($method->getName());
+}
 
 
-
-
-
+echo '<pre>';
+echo $ascii;
+echo '</pre>';
 
 
 
