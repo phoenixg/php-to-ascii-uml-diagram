@@ -150,36 +150,66 @@ class Pastor{
 $rc = new ReflectionClass('Pastor');
 
 // 初始化输出内容的变量
+// $strLenMax[最大可变长度] + 5[友好值] = 定值，无需变量。所有行的长度都应该扩充到该可变长度
+// $strLen + $strPad = $strLenMax
+$strLenMax = 50;
 $ascii  = '';
-$ascii .= '+-----------------------------------------+'.PHP_EOL;
+$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
 
 // 打印反射类
 d($rc);
 
 // 获取类名称
 d($rc->getName());// Paster
-$ascii .= '| '.$rc->getName().'                                  |';
+$ascii .= '| '.$rc->getName().str_repeat(' ', $strLenMax - strlen($rc->getName()) -1 ).'|'.PHP_EOL;
+$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
 
 // 获取类属性
-$props = $rc->getProperties( ReflectionProperty::IS_PUBLIC |
-                             ReflectionProperty::IS_PROTECTED |
-                             ReflectionProperty::IS_STATIC |
-                             ReflectionProperty::IS_PRIVATE );
+$props = $rc->getProperties( ReflectionProperty::IS_PUBLIC );
 foreach ($props as $prop) {
   d($prop->getName());
+  $ascii .= '| + '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
 }
+
+$props = $rc->getProperties( ReflectionProperty::IS_PROTECTED );
+foreach ($props as $prop) {
+  d($prop->getName());
+  $ascii .= '| # '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+}
+
+$props = $rc->getProperties( ReflectionProperty::IS_PRIVATE );
+foreach ($props as $prop) {
+  d($prop->getName());
+  $ascii .= '| - '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+}
+
+$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+
 
 // 获取类方法
-$methods = $rc->getMethods();
+$methods = $rc->getMethods( ReflectionMethod::IS_PUBLIC );
 foreach ($methods as $method) {
   d($method->getName());
+  $ascii .= '| + '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
 }
 
+$methods = $rc->getMethods( ReflectionMethod::IS_PROTECTED );
+foreach ($methods as $method) {
+  d($method->getName());
+  $ascii .= '| # '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+}
+
+$methods = $rc->getMethods( ReflectionMethod::IS_PRIVATE );
+foreach ($methods as $method) {
+  d($method->getName());
+  $ascii .= '| - '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+}
+
+$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
 
 echo '<pre>';
 echo $ascii;
 echo '</pre>';
-
 
 
 
