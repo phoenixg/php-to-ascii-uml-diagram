@@ -245,11 +245,19 @@ class Intellect extends Property
 
 
 
-echo parseClassToAscii('Intellect');
+echo parseClassToAscii('Agility');
 
 function parseClassToAscii($classname) {
   // 建立反射类
   $rc = new ReflectionClass($classname);
+
+  /*
+  $lineage = array();
+  while ($rc = $rc->getParentClass()) {
+    $lineage[] = $rc->getName();
+  }
+  d($lineage);
+  */
 
   // 初始化输出内容的变量
   // $strLenMax[最大可变长度] + 5[友好值] = 定值，无需变量。所有行的长度都应该扩充到该可变长度
