@@ -114,7 +114,14 @@ define('TAG_VISIBILITY_PROTECTED', '#');
 define('TAG_VISIBILITY_PRIVATE',   '-');
 define('TAG_DECORATE_STATIC',      '&lt;&lt;static&gt;&gt;');
 
-class Pastor{
+interface IPerson {
+  const  TYPE = 'HUMAN';
+  public function preach();
+  public function pray();
+  public function write();
+}
+
+class Pastor implements IPerson{
   private   $address;
   protected $hobby;
   public    $name = 'Tom';
@@ -128,89 +135,176 @@ class Pastor{
   }
 
   public function preach(){
-    echo 'We should love God';
+    return 'We should love God';
   }
 
-  public static function pray(){
-    echo 'God please forgive me';
+  public function pray(){
+    return 'God please forgive me';
   }
 
-  protected function write(){
-    echo 'I am writing';
+  public function write(){
+    return 'I am writing';
   }
 
-  private function makelove(){
-    echo 'I am making love';
+  public function makelove(){
+    return 'I am making love';
   }
 }
 
 
 
-// 建立反射类
-$rc = new ReflectionClass('Pastor');
-
-// 初始化输出内容的变量
-// $strLenMax[最大可变长度] + 5[友好值] = 定值，无需变量。所有行的长度都应该扩充到该可变长度
-// $strLen + $strPad = $strLenMax
-$strLenMax = 50;
-$ascii  = '';
-$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
-
-// 打印反射类
-d($rc);
-
-// 获取类名称
-d($rc->getName());// Paster
-$ascii .= '| '.$rc->getName().str_repeat(' ', $strLenMax - strlen($rc->getName()) -1 ).'|'.PHP_EOL;
-$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
-
-// 获取类属性
-$props = $rc->getProperties( ReflectionProperty::IS_PUBLIC );
-foreach ($props as $prop) {
-  d($prop->getName());
-  $ascii .= '| + '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+abstract class Weapon
+{
+    abstract public function description();
+    abstract public function cost();
 }
 
-$props = $rc->getProperties( ReflectionProperty::IS_PROTECTED );
-foreach ($props as $prop) {
-  d($prop->getName());
-  $ascii .= '| # '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+class Glave extends Weapon
+{
+    public function cost ()
+    {
+        return 100;
+    }
+
+    public function description ()
+    {
+        return 'Glave';
+    }
 }
 
-$props = $rc->getProperties( ReflectionProperty::IS_PRIVATE );
-foreach ($props as $prop) {
-  d($prop->getName());
-  $ascii .= '| - '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+class Knife extends Weapon
+{
+    public function cost ()
+    {
+        return 80;
+    }
+
+    public function description ()
+    {
+        return 'Knife';
+    }
 }
 
-$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+class Axe extends Weapon
+{
+    public function cost ()
+    {
+        return 120;
+    }
 
-
-// 获取类方法
-$methods = $rc->getMethods( ReflectionMethod::IS_PUBLIC );
-foreach ($methods as $method) {
-  d($method->getName());
-  $ascii .= '| + '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+    public function description ()
+    {
+        return 'Axe';
+    }
 }
 
-$methods = $rc->getMethods( ReflectionMethod::IS_PROTECTED );
-foreach ($methods as $method) {
-  d($method->getName());
-  $ascii .= '| # '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+class Property extends Weapon
+{
+    protected $_weapon = null;
+
+    protected $_price = 0;
+
+    protected $_description = '';
+
+    public function __construct(Weapon $weapon)
+    {
+        $this->_weapon = $weapon;
+    }
+
+    public function cost ()
+    {
+        return $this->_weapon->cost() + $this->_price;
+    }
+
+    public function description ()
+    {
+        return $this->_weapon->description().','.$this->_description;
+    }
 }
 
-$methods = $rc->getMethods( ReflectionMethod::IS_PRIVATE );
-foreach ($methods as $method) {
-  d($method->getName());
-  $ascii .= '| - '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+class Strength extends Property
+{
+    protected $_price = 250;
+
+    protected $_description = '+25 strength';
 }
 
-$ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+class Agility extends Property
+{
+    protected $_price = 300;
 
-echo '<pre>';
-echo $ascii;
-echo '</pre>';
+    protected $_description = '+30 agility';
+}
 
+class Intellect extends Property
+{
+    protected $_price = 200;
+
+    protected $_description = '+20 intellect';
+}
+
+
+
+echo parseClassToAscii('Intellect');
+
+function parseClassToAscii($classname) {
+  // 建立反射类
+  $rc = new ReflectionClass($classname);
+
+  // 初始化输出内容的变量
+  // $strLenMax[最大可变长度] + 5[友好值] = 定值，无需变量。所有行的长度都应该扩充到该可变长度
+  // $strLen + $strPad = $strLenMax
+  $strLenMax = 50;
+  $ascii  = '';
+  $ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+
+  // 打印反射类
+  // d($rc);
+
+  // 获取类名称
+  // d($rc->getName());// Paster
+  $ascii .= '| '.$rc->getName().str_repeat(' ', $strLenMax - strlen($rc->getName()) -1 ).'|'.PHP_EOL;
+  $ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+
+  // 获取类属性
+  $props = $rc->getProperties( ReflectionProperty::IS_PUBLIC );
+  foreach ($props as $prop) {
+    $ascii .= '| + '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+  }
+
+  $props = $rc->getProperties( ReflectionProperty::IS_PROTECTED );
+  foreach ($props as $prop) {
+    $ascii .= '| # '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+  }
+
+  $props = $rc->getProperties( ReflectionProperty::IS_PRIVATE );
+  foreach ($props as $prop) {
+    $ascii .= '| - '.$prop->getName().str_repeat(' ', $strLenMax - strlen($prop->getName()) -3 ).'|'.PHP_EOL;
+  }
+
+  $ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+
+
+  // 获取类方法
+  $methods = $rc->getMethods( ReflectionMethod::IS_PUBLIC );
+  foreach ($methods as $method) {
+    $ascii .= '| + '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+  }
+
+  $methods = $rc->getMethods( ReflectionMethod::IS_PROTECTED );
+  foreach ($methods as $method) {
+    $ascii .= '| # '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+  }
+
+  $methods = $rc->getMethods( ReflectionMethod::IS_PRIVATE );
+  foreach ($methods as $method) {
+    $ascii .= '| - '.$method->getName().'()'.str_repeat(' ', $strLenMax - strlen($method->getName()) -5 ).'|'.PHP_EOL;
+  }
+
+  $ascii .= '+'.str_repeat('-', $strLenMax).'+'.PHP_EOL;
+
+  return '<pre>'.$ascii.'</pre>';
+}
 
 
 
